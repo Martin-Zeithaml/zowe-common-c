@@ -27,9 +27,7 @@ DEPS_DESTINATION=$(get_destination "${COMMON}" "${PROJECT}")
 
 # These paths assume that the build is run from /zss/deps/zowe-common-c/builds
 
-date_stamp=$(date +%Y%m%d%S)
-
-TMP_DIR="${WORKING_DIR}/tmp-${date_stamp}"
+TMP_DIR="${WORKING_DIR}/tmp-cmgr"
 
 mkdir -p "${TMP_DIR}" && cd "${TMP_DIR}"
 
@@ -55,11 +53,18 @@ rm -f "${COMMON}/bin/configmgr"
 GSKDIR=/usr/lpp/gskssl
 GSKINC="${GSKDIR}/include"
 
+LISTING=$(echo "${LISTING}" | tr 'a-z' 'A-Z')
+if [ "${LISTING}" = "YES" ]; then
+  listing=",agg,list,so(),off,xref"
+else
+  listing=""
+fi
+
 xlclang \
   -c \
   -q64 \
   -qascii \
-  "-Wc,float(ieee),longname,langlvl(extc99),gonum,goff,ASM,asmlib('CEE.SCEEMAC','SYS1.MACLIB','SYS1.MODGEN')" \
+  "-Wc,float(ieee),longname,langlvl(extc99),gonum,goff,ASM,asmlib('CEE.SCEEMAC','SYS1.MACLIB','SYS1.MODGEN')${listing}" \
   -DYAML_VERSION_MAJOR=${MAJOR} \
   -DYAML_VERSION_MINOR=${MINOR} \
   -DYAML_VERSION_PATCH=${PATCH} \
@@ -163,9 +168,6 @@ xlclang \
 #  echo "Build failed"
 #  exit 8
 #fi
-
-rm -rf "${TMP_DIR}"
-
 
 # This program and the accompanying materials are
 # made available under the terms of the Eclipse Public License v2.0 which accompanies
